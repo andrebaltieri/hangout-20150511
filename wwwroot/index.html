@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Bem vindo ao AngularJS!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link rel="stylesheet" href="assets/css/styles.min.css"/>
+</head>
+<body>
+
+<div ng-include="'components/shared/navbar/navbar.view.html'"></div>
+
+<div class="container" ng-controller="HomeCtrl">
+    <div class="row">
+        <div class="col s12 m4 animated bounceIn" ng-repeat="caster in casters | orderBy:'-likes'">
+            <div class="card">
+                <div class="card-image waves-effect waves-block waves-light">
+                    <img class="activator" ng-src="{{ caster.image }}">
+                </div>
+                <div class="card-content">
+                    <span class="card-title activator grey-text text-darken-4">
+                        {{ caster.name }} <small>({{ caster.likes }} curtidas)</small>
+                        <i class="mdi-navigation-more-vert right"></i>
+                    </span>
+
+                    <p>
+                        <a href="javascript:void(null);" ng-click="addLike(caster)">
+                            <i class="mdi-image-exposure-plus-1"></i>
+                        </a>
+
+                        <a href="javascript:void(null);" class="right">
+                            EDITAR
+                        </a>
+                    </p>
+                </div>
+                <div class="card-reveal">
+                    <span class="card-title grey-text text-darken-4">{{ caster.name }}
+                        <i class="mdi-navigation-close right"></i>
+                    </span>
+
+                    <p>{{ caster.bio }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="center-align" ng-show="casters.length == 0">
+            <h5><em>Nenhum dado carregado</em></h5>
+        </div>
+    </div>
+
+    <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+        <a class="btn-floating btn-large red">
+            <i class="large mdi-editor-mode-edit"></i>
+        </a>
+        <ul>
+            <li><a class="btn-floating yellow darken-1" ng-click="saveData()"><i class="large mdi-content-save"></i></a>
+            </li>
+            <li><a class="btn-floating green" ng-click="loadLocalData()"><i class="large mdi-file-folder"></i></a></li>
+            <li><a class="btn-floating blue" ng-click="loadCloudData()"><i class="large mdi-file-cloud-circle"></i></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script src="assets/js/scripts.min.js"></script>
+<script>
+    angular.module('app', []);
+    angular.module('app').controller('HomeCtrl', function ($scope, $http) {
+        $scope.title = 'Bem vindo ao ASP.NET Cast';
+        $scope.casters = [];
+
+        $scope.loadCloudData = function () {
+            loadCloudData();
+            Materialize.toast('Dados carregados!', 4000);
+        };
+        $scope.loadLocalData = function () {
+            loadLocalData();
+            Materialize.toast('Dados carregados!', 4000);
+        };
+        $scope.saveData = function () {
+            saveData();
+            Materialize.toast('Dados salvos!', 4000);
+        };
+        $scope.addLike = function (caster) {
+            caster.likes++;
+        };
+
+        function loadCloudData() {
+            $http.get('data/casters.json')
+                    .success(function (data) {
+                        $scope.casters = angular.fromJson(data);
+                    })
+                    .catch(function () {
+                        alert('Falha ao recuperar dados');
+                    });
+        }
+
+        function loadLocalData() {
+            $scope.casters = angular.fromJson(localStorage.getItem('casters'));
+        }
+
+        function saveData() {
+            localStorage.setItem('casters', angular.toJson($scope.casters));
+        }
+    });
+</script>
+</body>
+</html>
